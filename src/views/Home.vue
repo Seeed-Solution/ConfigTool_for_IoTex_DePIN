@@ -17,7 +17,9 @@
     "Write": "写入",
     "text: dev-info-error": "获取设备信息失败，请再次连接串口。",
     "text: ap-resp-error": "获取数据失败。",
+    "Write succeeded": "写入成功",
     "end": "结束"
+
   }
 }
 </i18n>
@@ -295,7 +297,7 @@ export default {
       this.newVersion = arg
       document.getElementById('versionText').style.cursor = 'pointer'
     })
-    
+
     //comm
     ipcRenderer.on('dev-info-resp-error', (event, arg) => {
       console.log(arg)
@@ -314,6 +316,7 @@ export default {
       Message.error(arg)
     })
     ipcRenderer.on('dev-info-write-ack', (event, arg) => {
+      Message.success( this.$t('Write succeeded') )
       this.writeLoading = false
     })
 

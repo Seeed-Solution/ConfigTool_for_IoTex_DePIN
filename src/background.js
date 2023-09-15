@@ -320,9 +320,7 @@ ipcMain.on('serial-close-req', (event, arg) => {
 // ASCII Protocol
 function parseLine(line) {
   logger.debug(`parseLine: ${line}`)
-  // let line_ram = line
-  // line = line.trim()
-
+  
   // 解析 1.OK\r\n\r\n 2. AT-OK:<value>\r\n, 3. ERR\r\n<err msg>\r\n
   let found
   found  = line.match(/AT-OK:\s?(.*)/)
@@ -384,8 +382,8 @@ async function CmdAsync(strCmd, timeoutMs=3000) {
     await serialWriteAsync(strCmd)
 
     let h = setTimeout(() => {
-      ee.emit('error', new Error('Recv timeout'))
-      throw new Error(`Recv timeout`)
+      ee.emit('cmd-resp', {ret:'ERR', data:'Resp Timeout'})
+      // throw new Error(`Recv timeout`)
     }, timeoutMs)
 
     try {
@@ -460,6 +458,7 @@ ipcMain.on('dev-info-write', async (event, msg) => {
       }
     } catch (error) {
       event.reply('dev-info-write-ack-error', error)
+      return 
     }
 
     event.reply('dev-info-write-ack')
