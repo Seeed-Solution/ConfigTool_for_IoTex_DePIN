@@ -19,7 +19,7 @@ const { ReadlineParser } = require('@serialport/parser-readline')
 const { once, EventEmitter } = require('events')
 
 
-let appName = "IoTeX Configuration Tool"
+let appName = "Indicator IoTeX Configuration Tool"
 app.name = appName
 
 const logger = require("electron-log")

@@ -1,4 +1,4 @@
-# IoTeX Configuration Tool
+# Indicator IoTeX Configuration Tool
 
 A GUI tool for configuring SenseCAP Indicator of IoTex via serial port.
 
