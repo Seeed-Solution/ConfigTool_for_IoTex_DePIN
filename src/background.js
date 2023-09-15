@@ -320,17 +320,16 @@ ipcMain.on('serial-close-req', (event, arg) => {
 // ASCII Protocol
 function parseLine(line) {
   logger.debug(`parseLine: ${line}`)
-  
-  // 解析 1.OK\r\n\r\n 2. AT-OK:<value>\r\n, 3. ERR\r\n<err msg>\r\n
+
   let found
-  found  = line.match(/AT-OK:\s?(.*)/)
+  found  = line.match(/CMD_RESP:OK,\s?(.*)/)
   if (found) {
     logger.debug('RESP:OK,', found[1])
     let msg = {ret:'OK', data:found[1]}
     ee.emit('cmd-resp', msg)
     return
   }
-  found = line.match(/AT-ERR:\s?(.*)/)
+  found = line.match(/CMD_RESP:ERR,\s?(.*)/)
   if (found) {
     logger.debug('RESP:ERR,', found[1])
     let msg = {ret:'ERR', data:found[1]}
@@ -338,7 +337,7 @@ function parseLine(line) {
     return
   }
 
-  found  = line.match(/AT-OK/)
+  found  = line.match(/CMD_RESP:OK/)
   if (found) {
     logger.debug('RESP:OK,')
     let msg = {ret:'OK', data:''}
@@ -402,34 +401,23 @@ async function CmdAsync(strCmd, timeoutMs=3000) {
 ipcMain.on('dev-info-req', async (event) => {
   logger.info('dev-info-req ...')
   try {
-    let mac 
+    let mac
+    let wallet
+    let sn
     let msg 
     try {
-      msg = await CmdAsync("AT+MAC=?\r\n", 3000)
+      msg = await CmdAsync("Read_Device_Info\r\n", 3000)
       if( msg.ret == 'OK') {
-          mac = msg.data
+          let found = msg.data.match(/\s?(.*),\s?(.*),\s?(.*)/)
+          if( found ) {
+            mac = found[1]
+            sn = found[2]
+            wallet=found[3]
+          }
       } else {
         event.reply('dev-info-resp-error', msg.data)
       }
     } catch (error) {
-      event.reply(`dev-info-resp-error:`, error)
-    }
-
-    let  sn 
-    let  wallet
-    try {
-      msg = await CmdAsync("AT+MID=?\r\n", 3000)
-      if( msg.ret == 'OK') {
-        let found = msg.data.match(/SN:\s?([0-9]+),\s?Wallet:(.*)/)
-        if( found ) {
-          sn = found[1]
-          wallet=found[2]
-        }
-      } else {
-        event.reply('dev-info-resp-error', msg.data)
-      }
-    } catch (error) {
-      logger.debug('error:', error)
       event.reply(`dev-info-resp-error:`, error)
     }
 
@@ -449,7 +437,8 @@ ipcMain.on('dev-info-write', async (event, msg) => {
 
     //write
     logger.debug('device info:',msg)
-    let cmd = "AT+MID=" + msg.SN +',' + msg.Wallet +'\r\n'
+    let cmd = "Device_PIN" + ' -s '+msg.SN  + ' -w ' + msg.Wallet +'\r\n'
+    logger.debug('send cmd:', cmd)
     try {
       let resp = await CmdAsync(cmd, 3000)
       if( resp.ret == 'ERR' ) {
