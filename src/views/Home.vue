@@ -12,7 +12,7 @@
     "Serial Port": "串口",
     "WiFi MAC": "WiFi MAC",
     "Device SN": "SN",
-    "Wallet Addr": "钱包地址",
+    "ETH Wallet Addr": "ETH 钱包地址",
     "Read": "读取",
     "Write": "写入",
     "text: dev-info-error": "获取设备信息失败，请再次连接串口。",
@@ -46,15 +46,15 @@
               </v-text-field>
             </v-col>
 
-            <!-- sn -->
-            <v-col cols="12" class="py-0">
-              <v-text-field v-model="deviceSN" :label="$t('Device SN')" :rules="deviceSNRules" outlined dense>
+            <!-- ETH Addr -->
+              <v-col cols="12" class="py-0">
+              <v-text-field v-model="ETHAddr" :label="$t('ETH Wallet Addr')" disabled outlined dense>
               </v-text-field>
             </v-col>
 
-            <!-- wallet addr -->
+            <!-- sn -->
             <v-col cols="12" class="py-0">
-              <v-text-field v-model="WalletAddr" :label="$t('Wallet Addr')" :rules="WalletAddrRules" outlined dense>
+              <v-text-field v-model="deviceSN" :label="$t('Device SN')" :rules="deviceSNRules" outlined dense>
               </v-text-field>
             </v-col>
 
@@ -136,7 +136,7 @@ export default {
       //rules
       rules: rules,
       deviceSNRules: [rules.required, rules.num18],
-      WalletAddrRules: [rules.required, rules.charAndNum],
+      //ETHAddrRules: [rules.required, rules.charAndNum],
 
       //serial
       selectedSerialPort: null,
@@ -157,7 +157,7 @@ export default {
       //config fields
       wifiMAC: '',
       deviceSN: '',
-      WalletAddr: '',
+      ETHAddr: '',
 
       //stream parse
       stream: null,
@@ -212,7 +212,7 @@ export default {
       this.$message.error(this.$t('xxx'));
     },
     readFn() {
-      this.wifiMAC = this.deviceSN = this.WalletAddr = ''
+      this.wifiMAC = this.deviceSN = this.ETHAddr = ''
 
       ipcRenderer.send('dev-info-req')
       
@@ -221,7 +221,7 @@ export default {
 
     writeFn() {
       this.deviceSN = this.deviceSN.trim()
-      this.WalletAddr = this.WalletAddr.trim()
+      this.ETHAddr = this.ETHAddr.trim()
 
       if (!this.$refs.form1.validate()) return false
 
@@ -229,9 +229,9 @@ export default {
 
       console.log({
         deviceSN: this.deviceSN,
-        WalletAddr:  this.WalletAddr,
+        ETHAddr:  this.ETHAddr,
       })
-      let deviceInfo = {'SN':this.deviceSN, 'Wallet':this.WalletAddr}
+      let deviceInfo = {'SN':this.deviceSN}
       ipcRenderer.send('dev-info-write', deviceInfo)
 
     }
@@ -304,10 +304,10 @@ export default {
       Message.error(arg)
     })
     ipcRenderer.on('dev-info-resp', (event, arg) => {
-      let {'MAC':MAC, 'SN':SN, 'Wallet':Wallet} = arg
+      let {'MAC':MAC, 'SN':SN, 'ETH':ETH} = arg
       this.wifiMAC = MAC
       this.deviceSN = SN
-      this.WalletAddr = Wallet
+      this.ETHAddr = ETH
     })
 
     ipcRenderer.on('dev-info-write-ack-error', (event, arg) => {

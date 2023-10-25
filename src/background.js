@@ -402,7 +402,7 @@ ipcMain.on('dev-info-req', async (event) => {
   logger.info('dev-info-req ...')
   try {
     let mac
-    let wallet
+    let ETH
     let sn
     let msg 
     try {
@@ -412,7 +412,7 @@ ipcMain.on('dev-info-req', async (event) => {
           if( found ) {
             mac = found[1]
             sn = found[2]
-            wallet=found[3]
+            ETH=found[3]
           }
       } else {
         event.reply('dev-info-resp-error', msg.data)
@@ -421,7 +421,7 @@ ipcMain.on('dev-info-req', async (event) => {
       event.reply(`dev-info-resp-error:`, error)
     }
 
-    let deviceInfoObj = {'MAC': mac, 'SN':sn, 'Wallet':wallet}
+    let deviceInfoObj = {'MAC': mac, 'SN':sn, 'ETH':ETH}
     logger.debug('deviceInfoObj:', deviceInfoObj)
     event.reply('dev-info-resp', deviceInfoObj)
 
@@ -437,7 +437,7 @@ ipcMain.on('dev-info-write', async (event, msg) => {
 
     //write
     logger.debug('device info:',msg)
-    let cmd = "Device_PIN" + ' -s '+msg.SN  + ' -w ' + msg.Wallet +'\r\n'
+    let cmd = "Device_PIN" + ' -s '+msg.SN +'\r\n'
     logger.debug('send cmd:', cmd)
     try {
       let resp = await CmdAsync(cmd, 3000)

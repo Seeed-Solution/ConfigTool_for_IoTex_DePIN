@@ -1,7 +1,7 @@
 {
   "name": "sensecap_indicator_iotex_cfg_tool_ng",
   "description": "Indicator IoTeX Configuration Tool",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "homepage": "https://github.com/Seeed-Solution/ConfigTool_for_IoTex_DePIN",
   "repository": {
     "type": "git",
